@@ -160,15 +160,44 @@ app.use((req, res, next) => {
 	next();
 });
 
-// Simple status endpoint (placed early to ensure it works)
-app.get("/status", (req, res) => {
+// Simple test endpoint (placed early to ensure it works)
+app.get("/test", (req, res) => {
 	res.json({
-		message: "Server is running!",
+		message: "Test endpoint working!",
 		timestamp: new Date().toISOString(),
+		server_status: "OK",
 		db_connected: mongoose.connection.readyState === 1,
 		db_state: mongoose.connection.readyState,
 		path: req.path
 	});
+});
+
+// Database test endpoint
+app.get("/test-db", async (req, res) => {
+	try {
+		console.log("Testing database operation...");
+		const User = require("./models/user");
+		
+		// Test database operation
+		const userCount = await User.countDocuments();
+		const testUser = await User.findOne({ email: "test@test.com" });
+		
+		res.json({
+			message: "Database test successful",
+			db_connected: mongoose.connection.readyState === 1,
+			user_count: userCount,
+			test_user_found: !!testUser,
+			timestamp: new Date().toISOString()
+		});
+	} catch (error) {
+		console.error("Database test error:", error);
+		res.status(500).json({
+			message: "Database test failed",
+			error: error.message,
+			db_connected: mongoose.connection.readyState === 1,
+			timestamp: new Date().toISOString()
+		});
+	}
 });
 
 // Database status endpoint (must be before invalid routes)
