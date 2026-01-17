@@ -155,17 +155,24 @@ app.use((req, res, next) => {
 	next();
 });
 
-// All routes
-app.use("/api/auth", authRouter);
-app.use("/api/user", userRouter);
-app.use("/api/chat", chatRouter);
-app.use("/api/message", messageRouter);
+// Simple status endpoint (placed early to ensure it works)
+app.get("/status", (req, res) => {
+	res.json({
+		message: "Server is running!",
+		timestamp: new Date().toISOString(),
+		db_connected: mongoose.connection.readyState === 1,
+		db_state: mongoose.connection.readyState,
+		path: req.path
+	});
+});
 
 // Database status endpoint (must be before invalid routes)
 app.get("/db-status", async (req, res) => {
 	try {
+		console.log("DB Status endpoint called");
 		const User = require("./models/user");
 		const userCount = await User.countDocuments();
+		console.log(`Found ${userCount} users`);
 		res.json({
 			db_connected: mongoose.connection.readyState === 1,
 			db_state: mongoose.connection.readyState,
@@ -173,6 +180,7 @@ app.get("/db-status", async (req, res) => {
 			message: userCount > 0 ? `Found ${userCount} users in database` : "No users found"
 		});
 	} catch (error) {
+		console.error("DB Status error:", error);
 		res.json({
 			db_connected: false,
 			db_state: mongoose.connection.readyState,
@@ -181,6 +189,12 @@ app.get("/db-status", async (req, res) => {
 		});
 	}
 });
+
+// All routes
+app.use("/api/auth", authRouter);
+app.use("/api/user", userRouter);
+app.use("/api/chat", chatRouter);
+app.use("/api/message", messageRouter);
 
 // Invalid routes
 app.all("*", (req, res) => {
