@@ -12,6 +12,12 @@ const authorization = wrapAsync(async (req, res, next) => {
 		const userId = getUserIdFromToken(token);
 		console.log("Token userId:", userId);
 		
+		// Reject mock user IDs
+		if (userId && (userId.toString().startsWith("mock-user-id") || userId.toString().startsWith("test-token"))) {
+			console.log("Rejecting mock token:", userId);
+			return res.status(401).send({ message: "Invalid token - please login again" });
+		}
+		
 		if (userId) {
 			// Always use real database users - no mock data
 			req.user = await User.findById(userId).select("-password");
