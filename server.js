@@ -111,27 +111,6 @@ app.get("/test", (req, res) => {
 	});
 });
 
-// Database status endpoint
-app.get("/db-status", async (req, res) => {
-	try {
-		const User = require("./models/user");
-		const userCount = await User.countDocuments();
-		res.json({
-			db_connected: mongoose.connection.readyState === 1,
-			db_state: mongoose.connection.readyState,
-			user_count: userCount,
-			message: userCount > 0 ? `Found ${userCount} users in database` : "No users found"
-		});
-	} catch (error) {
-		res.json({
-			db_connected: false,
-			db_state: mongoose.connection.readyState,
-			user_count: 0,
-			error: error.message
-		});
-	}
-});
-
 // Test signup endpoint (no database)
 app.post("/test-signup", (req, res) => {
 	res.json({
@@ -181,6 +160,27 @@ app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/chat", chatRouter);
 app.use("/api/message", messageRouter);
+
+// Database status endpoint (must be before invalid routes)
+app.get("/db-status", async (req, res) => {
+	try {
+		const User = require("./models/user");
+		const userCount = await User.countDocuments();
+		res.json({
+			db_connected: mongoose.connection.readyState === 1,
+			db_state: mongoose.connection.readyState,
+			user_count: userCount,
+			message: userCount > 0 ? `Found ${userCount} users in database` : "No users found"
+		});
+	} catch (error) {
+		res.json({
+			db_connected: false,
+			db_state: mongoose.connection.readyState,
+			user_count: 0,
+			error: error.message
+		});
+	}
+});
 
 // Invalid routes
 app.all("*", (req, res) => {
