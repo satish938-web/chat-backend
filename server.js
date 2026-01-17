@@ -78,6 +78,7 @@ app.get("/", (req, res) => {
 		message: "Welcome to Chat Application!",
 		frontend_url: process.env.FRONTEND_URL,
 		status: "Server is running",
+		timestamp: new Date().toISOString(),
 		env_vars: {
 			MONGODB_URI: process.env.MONGODB_URI ? "SET" : "NOT SET",
 			JWT_SECRET: process.env.JWT_SECRET ? "SET" : "NOT SET",
