@@ -57,7 +57,7 @@ async function main() {
 	
 	try {
 		const options = {
-			serverSelectionTimeoutMS: 10000, // Timeout after 10s
+			serverSelectionTimeoutMS: 15000, // Timeout after 15s
 			socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
 			bufferMaxEntries: 0, // Disable mongoose buffering
 			bufferCommands: false, // Disable mongoose buffering
@@ -69,8 +69,15 @@ async function main() {
 			}
 		};
 		
+		console.log("Attempting to connect to MongoDB...");
 		await mongoose.connect(mongoUri, options);
 		console.log("Database Connection established");
+		
+		// Test the connection
+		const User = require("./models/user");
+		const userCount = await User.countDocuments();
+		console.log(`Found ${userCount} users in database`);
+		
 	} catch (error) {
 		console.error("Database connection failed:", error.message);
 		// Don't exit the app, let it run without DB for now
@@ -98,8 +105,31 @@ app.get("/test", (req, res) => {
 	res.json({
 		message: "Test endpoint working!",
 		timestamp: new Date().toISOString(),
-		server_status: "OK"
+		server_status: "OK",
+		db_connected: mongoose.connection.readyState === 1,
+		db_state: mongoose.connection.readyState
 	});
+});
+
+// Database status endpoint
+app.get("/db-status", async (req, res) => {
+	try {
+		const User = require("./models/user");
+		const userCount = await User.countDocuments();
+		res.json({
+			db_connected: mongoose.connection.readyState === 1,
+			db_state: mongoose.connection.readyState,
+			user_count: userCount,
+			message: userCount > 0 ? `Found ${userCount} users in database` : "No users found"
+		});
+	} catch (error) {
+		res.json({
+			db_connected: false,
+			db_state: mongoose.connection.readyState,
+			user_count: 0,
+			error: error.message
+		});
+	}
 });
 
 // Test signup endpoint (no database)
@@ -138,38 +168,6 @@ app.post("/api/auth/signup-test", (req, res) => {
 		token: token,
 		data: mockUser
 	});
-});
-
-// Test users endpoint
-app.get("/api/test-users", (req, res) => {
-	const mockUsers = [
-		{
-			_id: "mock-user-1",
-			firstName: "John",
-			lastName: "Doe",
-			email: "john@example.com",
-			image: "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-			createdAt: new Date().toISOString()
-		},
-		{
-			_id: "mock-user-2",
-			firstName: "Jane",
-			lastName: "Smith",
-			email: "jane@example.com",
-			image: "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-			createdAt: new Date().toISOString()
-		},
-		{
-			_id: "mock-user-3",
-			firstName: "Bob",
-			lastName: "Wilson",
-			email: "bob@example.com",
-			image: "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-			createdAt: new Date().toISOString()
-		}
-	];
-	
-	res.json({ message: "Test users endpoint", data: mockUsers });
 });
 
 // Add request debugging middleware
