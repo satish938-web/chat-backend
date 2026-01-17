@@ -170,6 +170,28 @@ app.get("/status", (req, res) => {
 app.get("/db-status", async (req, res) => {
 	try {
 		console.log("DB Status endpoint called");
+		
+		// Wait for database connection if not ready
+		if (mongoose.connection.readyState !== 1) {
+			console.log("Database not connected, waiting...");
+			
+			// Wait up to 5 seconds for connection
+			let attempts = 0;
+			while (mongoose.connection.readyState !== 1 && attempts < 50) {
+				await new Promise(resolve => setTimeout(resolve, 100));
+				attempts++;
+			}
+			
+			if (mongoose.connection.readyState !== 1) {
+				return res.json({
+					db_connected: false,
+					db_state: mongoose.connection.readyState,
+					user_count: 0,
+					message: "Database connection not established"
+				});
+			}
+		}
+		
 		const User = require("./models/user");
 		const userCount = await User.countDocuments();
 		console.log(`Found ${userCount} users`);
