@@ -57,11 +57,11 @@ async function main() {
 	
 	try {
 		const options = {
-			serverSelectionTimeoutMS: 15000, // Timeout after 15s
-			socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
+			serverSelectionTimeoutMS: 30000, // Increase timeout to 30s
+			socketTimeoutMS: 60000, // Increase socket timeout to 60s
 			maxPoolSize: 10, // Maintain up to 10 socket connections
-			bufferCommands: true, // Enable buffering for countDocuments to work
-			bufferMaxEntries: 0, // Disable mongoose buffering
+			bufferCommands: true, // Enable buffering for operations
+			bufferMaxEntries: 100, // Allow buffering
 			serverApi: {
 				version: '1',
 				strict: true,
@@ -72,6 +72,9 @@ async function main() {
 		console.log("Attempting to connect to MongoDB...");
 		await mongoose.connect(mongoUri, options);
 		console.log("Database Connection established");
+		
+		// Wait a moment for connection to stabilize
+		await new Promise(resolve => setTimeout(resolve, 2000));
 		
 		// Test the connection
 		const User = require("./models/user");
