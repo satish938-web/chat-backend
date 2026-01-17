@@ -7,9 +7,26 @@ const mongoose = require("mongoose");
 const app = express();
 
 const corsOptions = {
-	origin: process.env.FRONTEND_URL || ["https://frontend-chat1.onrender.com", "http://localhost:5173"],
-	methods: ["GET", "POST", "DELETE"],
-	allowedHeaders: ["Content-Type", "Authorization"],
+	origin: function (origin, callback) {
+		// Allow requests with no origin (like mobile apps or curl requests)
+		if (!origin) return callback(null, true);
+		
+		// Allow specific origins
+		const allowedOrigins = [
+			"https://frontend-chat1.onrender.com",
+			"http://localhost:5173",
+			"http://localhost:3000",
+			"https://localhost:5173"
+		];
+		
+		if (allowedOrigins.indexOf(origin) !== -1) {
+			callback(null, true);
+		} else {
+			callback(null, true); // Temporarily allow all origins
+		}
+	},
+	methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+	allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
 	credentials: true,
 };
 
