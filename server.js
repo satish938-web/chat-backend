@@ -56,11 +56,19 @@ async function main() {
 	}
 	
 	try {
-		await mongoose.connect(mongoUri);
+		const options = {
+			serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
+			socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
+			bufferMaxEntries: 0, // Disable mongoose buffering
+			bufferCommands: false, // Disable mongoose buffering
+		};
+		
+		await mongoose.connect(mongoUri, options);
 		console.log("Database Connection established");
 	} catch (error) {
-		console.error("Database connection failed:", error);
+		console.error("Database connection failed:", error.message);
 		// Don't exit the app, let it run without DB for now
+		console.log("Server will continue without database...");
 	}
 }
 
