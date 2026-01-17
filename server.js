@@ -104,15 +104,21 @@ app.post("/test-signup", (req, res) => {
 	});
 });
 
+// Add request debugging middleware
+app.use((req, res, next) => {
+	console.log(`${req.method} ${req.path} - ${new Date().toISOString()}`);
+	next();
+});
+
 // All routes
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/chat", chatRouter);
 app.use("/api/message", messageRouter);
 
-// Invaild routes
+// Invalid routes
 app.all("*", (req, res) => {
-	res.json({ error: "Invaild Route" });
+	res.json({ error: "Invalid Route" });
 });
 
 // Error handling middleware
