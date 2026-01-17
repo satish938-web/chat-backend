@@ -20,63 +20,16 @@ const getAuthUser = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
 	try {
-		// Check if database is connected, if not, use mock data
-		if (mongoose.connection.readyState !== 1) {
-			console.log("Database not connected, using mock users");
-			
-			// Mock users for testing
-			const mockUsers = [
-				{
-					_id: "mock-user-1",
-					firstName: "John",
-					lastName: "Doe",
-					email: "john@example.com",
-					image: "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-					createdAt: new Date().toISOString()
-				},
-				{
-					_id: "mock-user-2",
-					firstName: "Jane",
-					lastName: "Smith",
-					email: "jane@example.com",
-					image: "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-					createdAt: new Date().toISOString()
-				},
-				{
-					_id: "mock-user-3",
-					firstName: "Bob",
-					lastName: "Wilson",
-					email: "bob@example.com",
-					image: "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-					createdAt: new Date().toISOString()
-				},
-				{
-					_id: "mock-user-4",
-					firstName: "Alice",
-					lastName: "Johnson",
-					email: "alice@example.com",
-					image: "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-					createdAt: new Date().toISOString()
-				},
-				{
-					_id: "mock-user-5",
-					firstName: "Charlie",
-					lastName: "Brown",
-					email: "charlie@example.com",
-					image: "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-					createdAt: new Date().toISOString()
-				}
-			];
-			
-			console.log("Returning mock users:", mockUsers.length);
-			return res.status(200).json({ data: mockUsers });
-		}
-
-		// Original database code (when DB is connected)
+		// Only use real database users - no mock data
+		console.log("Getting all users from database");
+		
 		const allUsers = await User.find({ _id: { $ne: req.user._id } })
 			.select("-password")
 			.sort({ _id: -1 });
+		
+		console.log(`Found ${allUsers.length} real users in database`);
 		res.status(200).send({ data: allUsers });
+		
 	} catch (error) {
 		console.error("Get all users error:", error);
 		res.status(500).json({ 
