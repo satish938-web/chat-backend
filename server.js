@@ -16,7 +16,6 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-const PORT = process.env.PORT || 3000;
 
 // All routers
 const authRouter = require("./routes/auth");
@@ -59,6 +58,7 @@ app.use((err, req, res, next) => {
 });
 
 // Start the server
+const PORT = process.env.PORT || 9000;
 const server = app.listen(PORT, async () => {
 	console.log(`Server listening on ${PORT}`);
 });
