@@ -49,6 +49,7 @@ main()
 	.catch((err) => console.log(err));
 
 async function main() {
+	// Try multiple connection methods
 	const mongoUri = process.env.MONGODB_URI || "mongodb+srv://satish1:L8j6rRGCcZhED8HZ@cluster0.uwpa6ac.mongodb.net/chat-app?retryWrites=true&w=majority";
 	
 	if (!process.env.MONGODB_URI) {
@@ -70,6 +71,7 @@ async function main() {
 		};
 		
 		console.log("Attempting to connect to MongoDB...");
+		console.log("MongoDB URI:", mongoUri.replace(/:([^:@]+)@/, ':***@')); // Hide password in logs
 		await mongoose.connect(mongoUri, options);
 		console.log("Database Connection established");
 		
@@ -83,8 +85,8 @@ async function main() {
 		
 	} catch (error) {
 		console.error("Database connection failed:", error.message);
+		console.log("This is expected in free tier - continuing without database...");
 		// Don't exit the app, let it run without DB for now
-		console.log("Server will continue without database...");
 	}
 }
 
