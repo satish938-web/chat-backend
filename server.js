@@ -59,9 +59,9 @@ async function main() {
 		const options = {
 			serverSelectionTimeoutMS: 15000, // Timeout after 15s
 			socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
-			bufferMaxEntries: 0, // Disable mongoose buffering
-			bufferCommands: false, // Disable mongoose buffering
 			maxPoolSize: 10, // Maintain up to 10 socket connections
+			bufferCommands: true, // Enable buffering for countDocuments to work
+			bufferMaxEntries: 0, // Disable mongoose buffering
 			serverApi: {
 				version: '1',
 				strict: true,
