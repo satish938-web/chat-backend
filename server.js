@@ -160,46 +160,6 @@ app.use((req, res, next) => {
 	next();
 });
 
-// Simple test endpoint (placed early to ensure it works)
-app.get("/test", (req, res) => {
-	res.json({
-		message: "Test endpoint working!",
-		timestamp: new Date().toISOString(),
-		server_status: "OK",
-		db_connected: mongoose.connection.readyState === 1,
-		db_state: mongoose.connection.readyState,
-		path: req.path
-	});
-});
-
-// Database test endpoint
-app.get("/test-db", async (req, res) => {
-	try {
-		console.log("Testing database operation...");
-		const User = require("./models/user");
-		
-		// Test database operation
-		const userCount = await User.countDocuments();
-		const testUser = await User.findOne({ email: "test@test.com" });
-		
-		res.json({
-			message: "Database test successful",
-			db_connected: mongoose.connection.readyState === 1,
-			user_count: userCount,
-			test_user_found: !!testUser,
-			timestamp: new Date().toISOString()
-		});
-	} catch (error) {
-		console.error("Database test error:", error);
-		res.status(500).json({
-			message: "Database test failed",
-			error: error.message,
-			db_connected: mongoose.connection.readyState === 1,
-			timestamp: new Date().toISOString()
-		});
-	}
-});
-
 // Database status endpoint (must be before invalid routes)
 app.get("/db-status", async (req, res) => {
 	try {
@@ -251,6 +211,34 @@ app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/chat", chatRouter);
 app.use("/api/message", messageRouter);
+
+// Test endpoints (must be before invalid routes)
+app.get("/test-db", async (req, res) => {
+	try {
+		console.log("Testing database operation...");
+		const User = require("./models/user");
+		
+		// Test database operation
+		const userCount = await User.countDocuments();
+		const testUser = await User.findOne({ email: "test@test.com" });
+		
+		res.json({
+			message: "Database test successful",
+			db_connected: mongoose.connection.readyState === 1,
+			user_count: userCount,
+			test_user_found: !!testUser,
+			timestamp: new Date().toISOString()
+		});
+	} catch (error) {
+		console.error("Database test error:", error);
+		res.status(500).json({
+			message: "Database test failed",
+			error: error.message,
+			db_connected: mongoose.connection.readyState === 1,
+			timestamp: new Date().toISOString()
+		});
+	}
+});
 
 // Invalid routes
 app.all("*", (req, res) => {
