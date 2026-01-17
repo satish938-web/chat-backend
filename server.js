@@ -140,6 +140,38 @@ app.post("/api/auth/signup-test", (req, res) => {
 	});
 });
 
+// Test users endpoint
+app.get("/api/test-users", (req, res) => {
+	const mockUsers = [
+		{
+			_id: "mock-user-1",
+			firstName: "John",
+			lastName: "Doe",
+			email: "john@example.com",
+			image: "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
+			createdAt: new Date().toISOString()
+		},
+		{
+			_id: "mock-user-2",
+			firstName: "Jane",
+			lastName: "Smith",
+			email: "jane@example.com",
+			image: "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
+			createdAt: new Date().toISOString()
+		},
+		{
+			_id: "mock-user-3",
+			firstName: "Bob",
+			lastName: "Wilson",
+			email: "bob@example.com",
+			image: "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
+			createdAt: new Date().toISOString()
+		}
+	];
+	
+	res.json({ message: "Test users endpoint", data: mockUsers });
+});
+
 // Add request debugging middleware
 app.use((req, res, next) => {
 	console.log(`${req.method} ${req.path} - ${new Date().toISOString()}`);

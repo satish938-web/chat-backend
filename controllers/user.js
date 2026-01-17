@@ -49,10 +49,27 @@ const getAllUsers = async (req, res) => {
 					email: "bob@example.com",
 					image: "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
 					createdAt: new Date().toISOString()
+				},
+				{
+					_id: "mock-user-4",
+					firstName: "Alice",
+					lastName: "Johnson",
+					email: "alice@example.com",
+					image: "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
+					createdAt: new Date().toISOString()
+				},
+				{
+					_id: "mock-user-5",
+					firstName: "Charlie",
+					lastName: "Brown",
+					email: "charlie@example.com",
+					image: "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
+					createdAt: new Date().toISOString()
 				}
 			];
 			
-			return res.status(200).send({ data: mockUsers });
+			console.log("Returning mock users:", mockUsers.length);
+			return res.status(200).json({ data: mockUsers });
 		}
 
 		// Original database code (when DB is connected)
