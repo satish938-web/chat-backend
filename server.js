@@ -57,26 +57,18 @@ async function main() {
 	}
 	
 	try {
+		// Simplified connection options to avoid timeout issues
 		const options = {
-			serverSelectionTimeoutMS: 30000, // Increase timeout to 30s
-			socketTimeoutMS: 60000, // Increase socket timeout to 60s
-			maxPoolSize: 10, // Maintain up to 10 socket connections
-			bufferCommands: true, // Enable buffering for operations
-			bufferMaxEntries: 100, // Allow buffering
-			serverApi: {
-				version: '1',
-				strict: true,
-				deprecationErrors: true
-			}
+			serverSelectionTimeoutMS: 10000, // 10 seconds
+			socketTimeoutMS: 45000, // 45 seconds
+			maxPoolSize: 5, // Reduce pool size
 		};
 		
 		console.log("Attempting to connect to MongoDB...");
 		console.log("MongoDB URI:", mongoUri.replace(/:([^:@]+)@/, ':***@')); // Hide password in logs
+		
 		await mongoose.connect(mongoUri, options);
 		console.log("Database Connection established");
-		
-		// Wait a moment for connection to stabilize
-		await new Promise(resolve => setTimeout(resolve, 2000));
 		
 		// Test the connection
 		const User = require("./models/user");
