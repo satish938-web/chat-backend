@@ -139,7 +139,12 @@ const { Server } = require("socket.io");
 const io = new Server(server, {
 	pingTimeout: 60000,
 	transports: ["websocket"],
-	cors: corsOptions,
+	cors: {
+		origin: "*",
+		methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+		allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+		credentials: false
+	}
 });
 
 // Socket connection
