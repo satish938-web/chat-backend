@@ -13,9 +13,9 @@ const authorization = wrapAsync(async (req, res, next) => {
 		console.log("Token userId:", userId);
 		
 		if (userId) {
-			// Only use real database users
+			// Always use real database users - no mock data
 			req.user = await User.findById(userId).select("-password");
-			console.log("Found user:", req.user ? req.user.email : "User not found");
+			console.log("Found user from database:", req.user ? req.user.email : "User not found");
 			
 			if (!req.user) {
 				return res.status(404).send({ message: "User not found" });
