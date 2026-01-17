@@ -28,6 +28,15 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Add error handling middleware
+app.use((err, req, res, next) => {
+	console.error('Server Error:', err);
+	res.status(500).json({ 
+		message: err.message || "Internal Server Error",
+		error: process.env.NODE_ENV === 'development' ? err.stack : undefined
+	});
+});
+
 // All routers
 const authRouter = require("./routes/auth");
 const userRouter = require("./routes/user");
@@ -40,7 +49,19 @@ main()
 	.catch((err) => console.log(err));
 
 async function main() {
-	await mongoose.connect(process.env.MONGODB_URI);
+	const mongoUri = process.env.MONGODB_URI || "mongodb+srv://satish1:L8j6rRGCcZhED8HZ@cluster0.uwpa6ac.mongodb.net/chat-app";
+	
+	if (!process.env.MONGODB_URI) {
+		console.warn("MONGODB_URI not defined, using fallback");
+	}
+	
+	try {
+		await mongoose.connect(mongoUri);
+		console.log("Database Connection established");
+	} catch (error) {
+		console.error("Database connection failed:", error);
+		// Don't exit the app, let it run without DB for now
+	}
 }
 
 // Root route
@@ -48,6 +69,21 @@ app.get("/", (req, res) => {
 	res.json({
 		message: "Welcome to Chat Application!",
 		frontend_url: process.env.FRONTEND_URL,
+		status: "Server is running",
+		env_vars: {
+			MONGODB_URI: process.env.MONGODB_URI ? "SET" : "NOT SET",
+			JWT_SECRET: process.env.JWT_SECRET ? "SET" : "NOT SET",
+			FRONTEND_URL: process.env.FRONTEND_URL || "NOT SET"
+		}
+	});
+});
+
+// Test endpoint
+app.get("/test", (req, res) => {
+	res.json({
+		message: "Test endpoint working!",
+		timestamp: new Date().toISOString(),
+		server_status: "OK"
 	});
 });
 
