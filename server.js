@@ -49,7 +49,7 @@ main()
 	.catch((err) => console.log(err));
 
 async function main() {
-	const mongoUri = process.env.MONGODB_URI || "mongodb+srv://satish1:L8j6rRGCcZhED8HZ@cluster0.uwpa6ac.mongodb.net/chat-app";
+	const mongoUri = process.env.MONGODB_URI || "mongodb+srv://satish1:L8j6rRGCcZhED8HZ@cluster0.uwpa6ac.mongodb.net/chat-app?retryWrites=true&w=majority";
 	
 	if (!process.env.MONGODB_URI) {
 		console.warn("MONGODB_URI not defined, using fallback");
@@ -57,10 +57,16 @@ async function main() {
 	
 	try {
 		const options = {
-			serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
+			serverSelectionTimeoutMS: 10000, // Timeout after 10s
 			socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
 			bufferMaxEntries: 0, // Disable mongoose buffering
 			bufferCommands: false, // Disable mongoose buffering
+			maxPoolSize: 10, // Maintain up to 10 socket connections
+			serverApi: {
+				version: '1',
+				strict: true,
+				deprecationErrors: true
+			}
 		};
 		
 		await mongoose.connect(mongoUri, options);
@@ -102,6 +108,35 @@ app.post("/test-signup", (req, res) => {
 		message: "Test signup working!",
 		data: req.body,
 		token: "test-token-123"
+	});
+});
+
+// Working signup endpoint (bypass database for testing)
+app.post("/api/auth/signup-test", (req, res) => {
+	const { firstName, lastName, email, password } = req.body;
+	
+	// Basic validation
+	if (!firstName || !lastName || !email || !password) {
+		return res.status(400).json({ message: "All fields are required" });
+	}
+	
+	// Mock user creation
+	const mockUser = {
+		_id: "mock-user-id-" + Date.now(),
+		firstName,
+		lastName,
+		email,
+		password: "hashed-password"
+	};
+	
+	// Generate token
+	const jwt = require("jsonwebtoken");
+	const token = jwt.sign({ userId: mockUser._id }, "fallback-secret-key-for-production-2024", { expiresIn: "48h" });
+	
+	res.status(200).json({
+		message: "Registration Successfully",
+		token: token,
+		data: mockUser
 	});
 });
 
