@@ -95,6 +95,15 @@ app.get("/test", (req, res) => {
 	});
 });
 
+// Test signup endpoint (no database)
+app.post("/test-signup", (req, res) => {
+	res.json({
+		message: "Test signup working!",
+		data: req.body,
+		token: "test-token-123"
+	});
+});
+
 // All routes
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
